@@ -1,40 +1,17 @@
-# WebGPU Compute Cellular Automata
+Shows you all colors with the same brightness:
 
-Implementation of Multiple Neighborhoods Cellular Automata using WebGPU
+https://tom-huntington.github.io/match-brightness/
 
-![preview](preview.png)
-
-![preview2](preview2.gif)
-
-## Run
-
-### Chrome Canary
-
-This code is using WebGPU API, and was tested on Chrome Canary 105.0.5181.0 macOS.
-
-Install Chrome Canary.
-
-Turn on `#enable-unsafe-webgpu` via `chrome://flags` on Chrome Canary.
-
-[Live demo](https://dawidgorny.github.io/webgpu-cca/dist/)
+Brightness is calculated with the formula from https://stackoverflow.com/a/56678483/11998382
 
 ## Build and run
 
 ```
-yarn install
+yarn install 
+// didn't work for me. I got this to work though
+npm install --include=dev
 ```
 
 ```
 npm run dev
 ```
-
-## References
-
-- [Softology - Multiple Neighborhoods Cellular Automata](https://softologyblog.wordpress.com/2018/03/09/multiple-neighborhoods-cellular-automata/)
-- [SyntheticSearchSpace /
-  WebGL-Automata](https://github.com/SyntheticSearchSpace/WebGL-Automata/tree/master/WebGL-Automata/glsl)
-- [@psychobiotik - Intro to Compute Shaders](https://paprika.studio/workshops/compute/index.html)
-
-## License
-
-MIT
