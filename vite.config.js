@@ -10,3 +10,11 @@ export default defineConfig({
         },
     },
 });
+
+module.exports = {
+    root: './', // Set your source folder as the root
+    build: {
+       outDir: './docs', // Set your desired output directory,
+       emptyOutDir: true,
+    }
+ }
