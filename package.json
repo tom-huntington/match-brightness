@@ -1,5 +1,5 @@
 {
-    "name": "webgpu-cca",
+    "name": "match-brightness",
     "version": "0.0.0",
     "scripts": {
         "dev": "vite",
