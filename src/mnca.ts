@@ -61,9 +61,10 @@ class Renderer {
 
     //
 
-    seedRadius: number = 5.0;
-    nstates: number = 10;
-    rez: number = 100;
+    //red: number = 1.0;
+    //green: number = 0.0;
+    //blue: number = 0.0;
+    rez: number = 512;
 
     mousex: number = 0;
     mousey: number = 0;
@@ -126,25 +127,25 @@ class Renderer {
         this.canvas = canvas;
         this.fpsDom = document.getElementById("fps");
         this.resolution = this.rez = Math.round(
-            Math.max(this.canvas.width, this.canvas.height)
-        );
+             Math.max(this.canvas.width, this.canvas.height)
+         );
 
-        this.canvas.addEventListener("mousemove", (e: MouseEvent) => {
-            let rect = this.canvas.getBoundingClientRect();
-            this.mousex = ((e.clientX - rect.left) / rect.width) * this.rez;
-            this.mousey = ((e.clientY - rect.top) / rect.height) * this.rez;
-            if (this.mouse) {
-                this.paramsNeedUpdate = true;
-            }
-        });
-        this.canvas.addEventListener("mousedown", (e: MouseEvent) => {
-            this.mouse = 1;
-            this.paramsNeedUpdate = true;
-        });
-        document.body.addEventListener("mouseup", (e: MouseEvent) => {
-            this.mouse = 0;
-            this.paramsNeedUpdate = true;
-        });
+        // this.canvas.addEventListener("mousemove", (e: MouseEvent) => {
+        //     let rect = this.canvas.getBoundingClientRect();
+        //     this.mousex = ((e.clientX - rect.left) / rect.width) * this.rez;
+        //     this.mousey = ((e.clientY - rect.top) / rect.height) * this.rez;
+        //     if (this.mouse) {
+        //         this.paramsNeedUpdate = true;
+        //     }
+        // });
+        // this.canvas.addEventListener("mousedown", (e: MouseEvent) => {
+        //     this.mouse = 1;
+        //     this.paramsNeedUpdate = true;
+        // });
+        // document.body.addEventListener("mouseup", (e: MouseEvent) => {
+        //     this.mouse = 0;
+        //     this.paramsNeedUpdate = true;
+        // });
     }
 
     // Start the rendering engine
@@ -152,7 +153,7 @@ class Renderer {
         if (await this.initializeAPI()) {
             this.resizeBackings();
             await this.initializeResources();
-            this.render();
+            this.render({r: 255, g: 0, b: 0});
         }
     }
 
@@ -402,13 +403,13 @@ class Renderer {
         //
 
         this.simParamData = new Float32Array([
-            this.seedRadius,
-            this.nstates,
-            this.rez,
-            this.rowPitch,
-            this.mousex,
-            this.mousey,
-            this.mouse,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
         ]);
         this.simParamBuffer = this.device.createBuffer({
             size: this.simParamData.byteLength,
@@ -622,7 +623,8 @@ class Renderer {
         this.queue.submit([commandEncoder.finish()]);
     }
 
-    render = () => {
+    render = (color) => {
+        console.log(color);
         // Benchmark
         let t1 = performance.now();
         td = (td + (t1 - t0)) / 2.0;
@@ -638,14 +640,13 @@ class Renderer {
         this.colorTextureView = this.colorTexture.createView();
 
         // Write and submit commands to queue
-        this.encodeCommands();
 
-        if (this.paramsNeedUpdate) {
+        if (true) {
             this.paramsNeedUpdate = false;
 
-            this.simParamData[0] = this.seedRadius;
-            this.simParamData[1] = this.nstates;
-            this.simParamData[2] = this.rez;
+            this.simParamData[0] = color.r / 255.0;
+            this.simParamData[1] = color.g / 255.0;
+            this.simParamData[2] = color.b / 255.0;
             this.simParamData[3] = this.rowPitch;
             this.simParamData[4] = this.mousex;
             this.simParamData[5] = this.mousey;
@@ -671,10 +672,13 @@ class Renderer {
         }
         //
 
+        this.encodeCommands();
+
+
         ++t;
 
         // Refresh canvas
-        requestAnimationFrame(this.render);
+        //requestAnimationFrame(this.render);
     };
 }
 

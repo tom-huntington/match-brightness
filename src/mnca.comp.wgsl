@@ -1,7 +1,7 @@
 struct SimParams {
-    seedRadius : f32,
-    nstates : f32,
-    rez : f32,
+    red : f32,
+    green : f32,
+    blue : f32,
     rowPitch : f32,
     mousex : f32,
     mousey : f32,
@@ -16,27 +16,6 @@ struct Cells {
 @binding(1) @group(0) var<storage, read> currentCells : Cells;
 @binding(2) @group(0) var<storage, read_write> cells : Cells;
 @binding(3) @group(0) var outputTex : texture_storage_2d<rgba8unorm, write>;
-
-// via "The Art of Code" on Youtube
-fn Random(p : vec2<f32>) -> vec2<f32> {
-    var a : vec3<f32> = fract(p.xyx * vec3<f32>(123.34, 234.34, 345.65));
-    a = a + dot(a, a + 34.45);
-    return fract(vec2<f32>(a.x * a.y, a.y * a.z));
-}
-
-fn toCellIndex(coords : vec2<i32> ) -> u32 {
-   return u32(coords.y * i32(params.rez) + coords.x); 
-}
-
-fn S(coords : vec2<i32>, offset : vec2<i32>, next : i32) -> i32 {
-    var cellIdx : u32 = toCellIndex(coords + offset);
-    return i32(currentCells.data[cellIdx] > 0.0);
-}
-
-fn renderColor(state : f32, statesNum : f32) -> vec4<f32> {
-    var v = state / statesNum;
-    return vec4<f32>(v, v, v, 1.0);
-}
 
 fn brightness_(color : vec3<f32>) -> f32 {
   var fold = vec3<f32>(0.299, 0.587 , 0.114) * color * color;
@@ -75,7 +54,7 @@ fn YtoLstar(Y : f32) -> f32 {
 
 fn brightness(color : vec3<f32>) -> f32 {
  //return YtoLstar(luminance(color));
- return luminance(color);
+ return sqrt(luminance(color));
 }
 
 @compute @workgroup_size(64, 1, 1)
@@ -99,7 +78,8 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID : vec3<u32>) {
     }
     var color = sat * hue + (1-sat) * vec3<f32>(1,1,1);
     
-    var target_color = vec3<f32>(1,0,0);
+    //var target_color = vec3<f32>(1,0,0);
+    var target_color = vec3<f32>(params.red, params.green, params.blue);
     //color *= (brightness_(vec3<f32>(0,0,1))/brightness_(color));
     //textureStore(outputTex, coords, vec4<f32>(color, 1.0));
     //return;
@@ -110,18 +90,24 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID : vec3<u32>) {
     var xi = color * 1.5;
     var xim = color / 1.5;
 
-    for (var i = 0u; i < 10; i++) {
+    for (var i = 0u; i < 20; i++) {
       var bxi = brightness(xi);
       var bxim = brightness(xim);
       var xip = xi - (bxi - target_brightness) * (xi - xim) / (bxi - bxim);
-      if (distance(bxi, bxim) > 0.0000000001)
+      if (distance(bxi, bxim) > 0.000000000001)
       {
         xim = xi;
         xi = xip;
       }
     }
     //var b = brightness(xi) / 100;
+    var maxcord = max(xi.x, max(xi.y, xi.z));
+    if (maxcord > 1.0)
+    {
+      xi = vec3();
+    }
     textureStore(outputTex, coords, vec4<f32>(xi, 1.0));
+    //textureStore(outputTex, coords, vec4<f32>(params.red, params.green, params.blue, 1.0));
     
     
 }
